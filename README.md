@@ -4,13 +4,18 @@ Bộ bài tập này dành cho bạn đã từng học OOP/DSA nhưng bị "rơi
 
 ## Cấu trúc
 
-| File | Nội dung | Cấp độ |
-|------|----------|--------|
-| [01-oop-co-ban.md](01-oop-co-ban.md) | Class, Object, 4 tính chất OOP | ⭐ – ⭐⭐ |
-| [02-oop-nang-cao.md](02-oop-nang-cao.md) | SOLID, Design Patterns, Layered Architecture | ⭐⭐⭐ – ⭐⭐⭐⭐ |
-| [03-dsa-co-ban.md](03-dsa-co-ban.md) | Array, String, HashMap, Stack, Queue, Linked List, Sort, Binary Search | ⭐ – ⭐⭐ |
-| [04-dsa-nang-cao.md](04-dsa-nang-cao.md) | Tree, Heap, Graph, Trie, Sliding Window, DP | ⭐⭐⭐ – ⭐⭐⭐⭐ |
-| [05-du-an-tong-hop.md](05-du-an-tong-hop.md) | Mini-project kết hợp OOP + DSA | ⭐⭐⭐⭐⭐ |
+| File | Nội dung | Số bài | Cấp độ |
+|------|----------|--------|--------|
+| [01-oop-co-ban.md](01-oop-co-ban.md) | Class, Object, 4 tính chất OOP, Generics, Value Object | 27 bài + 22 LeetCode | ⭐ – ⭐⭐ |
+| [02-oop-nang-cao.md](02-oop-nang-cao.md) | SOLID, Design Patterns, Layered / Hexagonal / CQRS | 36 bài + 26 LeetCode | ⭐⭐⭐ – ⭐⭐⭐⭐ |
+| [03-dsa-co-ban.md](03-dsa-co-ban.md) | Array, String, HashMap, Stack, Queue, Linked List, Sort, Binary Search | 46 bài (kèm LeetCode) | ⭐ – ⭐⭐ |
+| [04-dsa-nang-cao.md](04-dsa-nang-cao.md) | Tree, Heap, Graph, Trie, Backtracking, Sliding Window, DP | 53 bài (kèm LeetCode) | ⭐⭐⭐ – ⭐⭐⭐⭐ |
+| [05-du-an-tong-hop.md](05-du-an-tong-hop.md) | Mini-project / Low-Level Design kết hợp OOP + DSA | 20 dự án | ⭐⭐⭐ – ⭐⭐⭐⭐⭐ |
+
+## Về phần LeetCode
+- Mỗi file có mục **🧩 LeetCode**: bài mới có link ngay dưới đề, bài cũ có bảng đối chiếu sang LeetCode.
+- Nên làm **bài bối cảnh Backend trước**, sau đó nộp bài LeetCode tương ứng để kiểm tra edge case & hiệu năng.
+- Bài có ký hiệu 🔒 là Premium – có thể bỏ qua hoặc tìm bản free tương đương được ghi kèm.
 
 ## Ngôn ngữ
 Đề bài viết **không phụ thuộc ngôn ngữ**. Khuyến nghị:

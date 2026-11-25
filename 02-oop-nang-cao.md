@@ -121,6 +121,151 @@ Entity / DTO / Mapper
 
 ---
 
+# ➕ Bài tập bổ sung
+
+## D. Design Patterns (tiếp)
+
+### Bài 2.16 ⭐⭐⭐ – Template Method: Import dữ liệu
+Abstract class `DataImporter` có `importFile(path)` cố định các bước: `read → parse → validate → save → report`.
+- Lớp con `CsvImporter`, `JsonImporter`, `ExcelImporter` chỉ override `parse()` (và tùy chọn `validate()`).
+- **Câu hỏi:** Template Method khác Strategy ở đâu (kế thừa vs composition)?
+
+### Bài 2.17 ⭐⭐⭐ – Command: Job có Undo
+- Interface `Command { execute(); undo(); }`. Các lệnh: `CreateUserCommand`, `ChangePriceCommand`, `BulkDeleteCommand`.
+- `CommandInvoker` lưu lịch sử, hỗ trợ `undo()` / `redo()` và **ghi audit log** mỗi lệnh.
+- Liên quan LeetCode **2296** (Design a Text Editor).
+
+### Bài 2.18 ⭐⭐⭐ – Proxy: Caching & Access Control
+- `ProductService` thật gọi DB (giả lập `sleep 200ms`).
+- `CachingProductServiceProxy` cache kết quả `getById` với TTL; `SecuredProductServiceProxy` kiểm tra quyền trước khi `delete`.
+- **Câu hỏi:** Proxy khác Decorator thế nào? (`@Transactional`, `@Cacheable` của Spring là Proxy.)
+- Liên quan LeetCode **2622**, **2623**.
+
+### Bài 2.19 ⭐⭐⭐ – Facade: Checkout
+`CheckoutFacade.placeOrder(cartId, paymentInfo)` gọi bên trong: `InventoryService.reserve`, `PricingService.calculate`, `PaymentService.charge`, `OrderService.create`, `NotificationService.send`.
+- Nếu thanh toán lỗi → **hoàn lại kho đã reserve** (compensation).
+
+### Bài 2.20 ⭐⭐⭐ – Composite: Cây quyền / Menu
+- `PermissionComponent` → `Permission` (lá) và `PermissionGroup` (chứa nhiều component).
+- `group.has("order:delete")` duyệt đệ quy. Group có thể lồng group.
+- **Mở rộng:** Tính tổng dung lượng thư mục (File/Folder) theo cùng pattern.
+
+### Bài 2.21 ⭐⭐⭐ – Iterator: Duyệt API phân trang
+- `PagedIterator<T>` bọc một hàm `fetchPage(cursor) -> (items, nextCursor)`.
+- Client dùng `for (item : iterator)` mà **không biết** gì về phân trang; chỉ gọi trang tiếp khi cần (lazy).
+- Liên quan LeetCode **341**, **284**, **173**.
+
+### Bài 2.22 ⭐⭐⭐ – Abstract Factory: Đa database
+- `DatabaseFactory` → `MySqlFactory`, `PostgresFactory`; mỗi factory tạo bộ đôi `Connection` + `QueryDialect` tương thích (VD: `LIMIT/OFFSET` vs `FETCH FIRST`, quote `` ` `` vs `"`).
+- **Câu hỏi:** Abstract Factory khác Factory Method thế nào?
+
+### Bài 2.23 ⭐⭐⭐ – Prototype: Template email
+- `EmailTemplate` (subject, body, attachments, headers) có `clone()` deep copy.
+- `TemplateRegistry` lưu template gốc; mỗi lần gửi clone rồi điền biến `{{name}}`, `{{orderId}}`.
+
+### Bài 2.24 ⭐⭐⭐ – Null Object & Optional
+- Thay vì `if (logger != null)`, `if (discount != null)` khắp nơi → `NoOpLogger`, `NoDiscount`.
+- Refactor 1 đoạn code có ≥ 5 lần kiểm tra null.
+
+### Bài 2.25 ⭐⭐⭐⭐ – Object Pool: Connection Pool
+- `ConnectionPool(maxSize)`: `acquire(timeout)`, `release(conn)`. Hết connection → chờ tối đa `timeout` rồi exception.
+- Thread-safe (semaphore / blocking queue); kiểm tra connection còn “sống” trước khi trả ra.
+- Liên quan LeetCode **1188** (premium) – Design Bounded Blocking Queue.
+
+### Bài 2.26 ⭐⭐⭐⭐ – Circuit Breaker (State pattern)
+- 3 trạng thái: `CLOSED → OPEN` (lỗi ≥ N lần liên tiếp) `→ HALF_OPEN` (sau T giây) `→ CLOSED/OPEN`.
+- `breaker.call(supplier)`; khi `OPEN` trả fallback ngay không gọi service.
+- Kết hợp **Retry với exponential backoff + jitter**. Inject `Clock` để test.
+
+### Bài 2.27 ⭐⭐⭐⭐ – Memento: Lưu nháp bài viết
+- `Article.save() -> Memento`, `Article.restore(memento)`; `History` giữ tối đa 20 phiên bản.
+- Memento không cho bên ngoài đọc/sửa trạng thái bên trong (đóng gói).
+
+### Bài 2.28 ⭐⭐⭐⭐ – Mediator: Chat room
+- `ChatRoom` (mediator) điều phối `User.send(msg)`; user không giữ tham chiếu trực tiếp tới nhau.
+- Hỗ trợ tin nhắn riêng, mute user, bot tự động trả lời khi có từ khóa.
+
+### Bài 2.29 ⭐⭐⭐⭐ – Visitor: Xuất báo cáo nhiều định dạng
+- Cây đối tượng `Report → Section → Table / Paragraph / Chart`.
+- `JsonExportVisitor`, `HtmlExportVisitor`, `WordCountVisitor` – thêm định dạng mới không sửa các class node.
+- Liên quan LeetCode **1628** (premium) – Expression Tree.
+
+### Bài 2.30 ⭐⭐⭐⭐ – Specification Pattern: Bộ lọc sản phẩm
+```
+spec = priceBetween(100, 500).and(inCategory("phone")).and(not(outOfStock()))
+repo.findAll(spec)
+```
+- Mỗi spec có `isSatisfiedBy(product)` và **có thể dịch sang SQL** `toSql() -> (where, params)`.
+
+## E. Kiến trúc & Thiết kế hệ thống nhỏ
+
+### Bài 2.31 ⭐⭐⭐⭐ – Unit of Work + Repository
+- `UnitOfWork` theo dõi entity `new / dirty / removed`; `commit()` ghi tất cả hoặc không gì cả.
+- Mô phỏng chuyển tiền giữa 2 tài khoản: lỗi giữa chừng → rollback toàn bộ.
+
+### Bài 2.32 ⭐⭐⭐⭐ – Hexagonal Architecture (Ports & Adapters)
+- Domain `Order` không import bất kỳ thứ gì từ DB/HTTP.
+- Port: `OrderRepositoryPort`, `PaymentPort`, `NotificationPort`. Adapter: `InMemory`, `FakeStripe`, `ConsoleEmail`.
+- Viết **2 driving adapter**: CLI và HTTP giả lập – dùng chung một use case `PlaceOrderUseCase`.
+
+### Bài 2.33 ⭐⭐⭐⭐ – CQRS mini
+- Command side: `CreateProduct`, `UpdatePrice` ghi vào `EventStore` (danh sách event).
+- Query side: `ProductReadModel` được cập nhật từ event, tối ưu cho `search` và `topCheapest`.
+- **Mở rộng:** Event Sourcing – dựng lại trạng thái sản phẩm từ đầu bằng cách replay event.
+
+### Bài 2.34 ⭐⭐⭐⭐ – Plugin Architecture
+- Interface `PaymentPlugin { name(); supports(currency); pay(...) }`.
+- `PluginRegistry` tự đăng ký plugin (annotation / decorator / ServiceLoader / entry points).
+- Thêm plugin mới chỉ bằng **thêm 1 file** – không sửa registry (Open/Closed).
+
+### Bài 2.35 ⭐⭐⭐⭐ – Refactor Code Smells
+Cho đoạn code ~150 dòng (tự viết hoặc lấy từ project cũ) có: method dài, `switch` theo type, magic number, duplicate code, data class nghèo nàn (anemic), feature envy.
+- Liệt kê từng smell → pattern/kỹ thuật refactor tương ứng → refactor từng bước, **giữ test xanh** sau mỗi bước.
+
+### Bài 2.36 ⭐⭐⭐⭐ – Multi-tenant Service
+- Mỗi request có `tenantId`; `TenantContext` (ThreadLocal / context var) giữ tenant hiện tại.
+- Repository tự lọc dữ liệu theo tenant; middleware (Decorator Bài 2.11) gán tenant từ header.
+- **Câu hỏi:** Ưu/nhược của: chung DB chung bảng / chung DB khác schema / mỗi tenant một DB.
+
+---
+
+# 🧩 Luyện tập LeetCode (Design – mức Medium → Hard)
+
+> Với mỗi bài: vẽ sơ đồ class trước, chọn cấu trúc dữ liệu cho từng method, ghi Big-O, rồi mới code.
+
+| # | Bài LeetCode | Độ khó | Pattern / Kỹ năng | Liên quan |
+|---|--------------|--------|-------------------|-----------|
+| 1 | [146. LRU Cache](https://leetcode.com/problems/lru-cache/) | Medium | Proxy cache, HashMap + DLL | 2.18 |
+| 2 | [460. LFU Cache](https://leetcode.com/problems/lfu-cache/) | Hard | Thiết kế nhiều cấu trúc phối hợp | 2.18 |
+| 3 | [355. Design Twitter](https://leetcode.com/problems/design-twitter/) | Medium | Observer / feed, Heap | 2.10 |
+| 4 | [1146. Snapshot Array](https://leetcode.com/problems/snapshot-array/) | Medium | Memento, versioning | 2.27 |
+| 5 | [981. Time Based Key-Value Store](https://leetcode.com/problems/time-based-key-value-store/) | Medium | Versioned storage | 2.33 |
+| 6 | [2296. Design a Text Editor](https://leetcode.com/problems/design-a-text-editor/) | Hard | Command / Undo | 2.17 |
+| 7 | [341. Flatten Nested List Iterator](https://leetcode.com/problems/flatten-nested-list-iterator/) | Medium | Iterator + Composite | 2.20, 2.21 |
+| 8 | [284. Peeking Iterator](https://leetcode.com/problems/peeking-iterator/) | Medium | Decorator trên Iterator | 2.11, 2.21 |
+| 9 | [173. Binary Search Tree Iterator](https://leetcode.com/problems/binary-search-tree-iterator/) | Medium | Lazy Iterator | 2.21 |
+| 10 | [1286. Iterator for Combination](https://leetcode.com/problems/iterator-for-combination/) | Medium | Iterator | 2.21 |
+| 11 | [1628. Design an Expression Tree With Evaluate Function](https://leetcode.com/problems/design-an-expression-tree-with-evaluate-function/) 🔒 | Medium | Composite / Polymorphism / Factory | 2.29 |
+| 12 | [2353. Design a Food Rating System](https://leetcode.com/problems/design-a-food-rating-system/) | Medium | Read model / index | 2.33 |
+| 13 | [1912. Design Movie Rental System](https://leetcode.com/problems/design-movie-rental-system/) | Hard | Nhiều index sorted | 2.30 |
+| 14 | [380. Insert Delete GetRandom O(1)](https://leetcode.com/problems/insert-delete-getrandom-o1/) | Medium | Kết hợp cấu trúc dữ liệu | – |
+| 15 | [432. All O'one Data Structure](https://leetcode.com/problems/all-oone-data-structure/) | Hard | Bucket + DLL | – |
+| 16 | [2502. Design Memory Allocator](https://leetcode.com/problems/design-memory-allocator/) | Medium | Object Pool / cấp phát tài nguyên | 2.25 |
+| 17 | [2349. Design a Number Container System](https://leetcode.com/problems/design-a-number-container-system/) | Medium | Index + lazy deletion | – |
+| 18 | [1348. Tweet Counts Per Frequency](https://leetcode.com/problems/tweet-counts-per-frequency/) | Medium | Thống kê theo cửa sổ thời gian | – |
+| 19 | [1114. Print in Order](https://leetcode.com/problems/print-in-order/) | Easy | Đồng bộ thread (nền tảng Singleton thread-safe) | 2.6 |
+| 20 | [1117. Building H2O](https://leetcode.com/problems/building-h2o/) | Medium | Semaphore / barrier | 2.25 |
+| 21 | [1226. The Dining Philosophers](https://leetcode.com/problems/the-dining-philosophers/) | Medium | Deadlock, lock ordering | 2.25 |
+| 22 | [2622. Cache With Time Limit](https://leetcode.com/problems/cache-with-time-limit/) | Medium | Cache có TTL (Proxy) | 2.18 |
+| 23 | [2623. Memoize](https://leetcode.com/problems/memoize/) | Medium | Decorator / Proxy cho hàm | 2.11, 2.18 |
+| 24 | [2627. Debounce](https://leetcode.com/problems/debounce/) | Medium | Decorator hàm | 2.11 |
+| 25 | [2666. Allow One Function Call](https://leetcode.com/problems/allow-one-function-call/) | Easy | Decorator / Singleton init | 2.6, 2.11 |
+| 26 | [2637. Promise Time Limit](https://leetcode.com/problems/promise-time-limit/) | Medium | Timeout wrapper (tiền đề Circuit Breaker) | 2.26 |
+
+> 🔒 = bài Premium.
+
+---
+
 ## Checklist sau Phần 2
 - [ ] Nhìn code và chỉ ra vi phạm SOLID nào
 - [ ] Code thuộc lòng: Singleton, Factory, Builder, Strategy, Observer, Decorator
